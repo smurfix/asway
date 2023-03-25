@@ -22,6 +22,7 @@ class Event(Enum):
     SHUTDOWN = 'shutdown'
     TICK = 'tick'
     INPUT = 'input'
+    SEAT = 'seat'
     WORKSPACE_FOCUS = 'workspace::focus'
     WORKSPACE_INIT = 'workspace::init'
     WORKSPACE_EMPTY = 'workspace::empty'
@@ -43,6 +44,8 @@ class Event(Enum):
     SHUTDOWN_EXIT = 'shutdown::exit'
     INPUT_ADDED = 'input::added'
     INPUT_REMOVED = 'input::removed'
+    SEAT_ADDED = 'seat::added'
+    SEAT_REMOVED = 'seat::removed'
 
 
 Event._subscribable_events = [e for e in Event if '::' not in e.value]
@@ -269,3 +272,11 @@ class InputEvent(IpcBaseEvent):
         self.ipc_data = data
         self.change = data['change']
         self.input = InputReply(data['input'])
+
+class SeatEvent(IpcBaseEvent):
+    """(sway only) Sent when a seat is added or removed.
+    """
+    def __init__(self, data):
+        self.ipc_data = data
+        self.change = data['change']
+        self.seat = data['seat']

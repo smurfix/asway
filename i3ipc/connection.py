@@ -369,6 +369,8 @@ class Connection:
             events_obj.append("tick")
         if events & EventType.INPUT.value:
             events_obj.append("input")
+        if events & EventType.SEAT.value:
+            events_obj.append("seat")
 
         try:
             self._sub_lock.acquire()
@@ -445,6 +447,8 @@ class Connection:
             event_type = EventType.TICK
         elif base_event == 'input':
             event_type = EventType.INPUT
+        elif base_event == 'seat':
+            event_type = EventType.SEAT
 
         if not event_type:
             raise Exception('event not implemented')
