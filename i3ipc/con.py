@@ -96,7 +96,7 @@ class Con:
 	    'focused_seats', 'fullscreen_mode', 'id', 'layout', 'marks',
 	    'name', 'num', 'orientation', 'percent', 'scratchpad_state',
 	    'shell', 'sticky', 'type', 'urgent', 'window', 'pid', 'app_id',
-	    'representation', 'visible'
+	    'representation', 'visible', 'most_recent_seat',
         ]
         for attr in ipc_properties:
             if attr in data:
