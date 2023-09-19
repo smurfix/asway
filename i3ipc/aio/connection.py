@@ -60,7 +60,10 @@ class _AIOPubSub(PubSub):
         if data and hasattr(data, 'change'):
             detail = data.change
 
-        for s in self._subscriptions:
+        handlers = self._subscriptions.get(event)
+        if not handlers:
+            return
+        for s in list(handlers.values()):
             if s['event'] == event:
                 if not s['detail'] or s['detail'] == detail:
                     self.queue_handler(s['handler'], data)
