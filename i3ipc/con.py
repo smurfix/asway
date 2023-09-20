@@ -85,7 +85,7 @@ class Con:
     :ivar ipc_data: The raw data from the i3 ipc.
     :vartype ipc_data: dict
     """
-    def __init__(self, data, parent, conn):
+    def __init__(self, data, parent, conn, floats=False):
         self.ipc_data = data
         self._conn = conn
         self.parent = parent
@@ -98,10 +98,9 @@ class Con:
             'visible'
         ]
         for attr in ipc_properties:
-            if attr in data:
-                setattr(self, attr, data[attr])
-            else:
-                setattr(self, attr, None)
+            setattr(self, attr, data.get(attr))
+        if self.floating is None:
+            self.floating = floats
 
         # XXX in 4.12, marks is an array (old property was a string "mark")
         if self.marks is None:
@@ -131,7 +130,7 @@ class Con:
         self.floating_nodes = []
         if 'floating_nodes' in data:
             for n in data['floating_nodes']:
-                self.floating_nodes.append(self.__class__(n, self, conn))
+                self.floating_nodes.append(self.__class__(n, self, conn, floats=True))
 
         self.window_class = None
         self.window_instance = None
@@ -181,7 +180,7 @@ class Con:
         :returns: Whether this is a floating node
         :rtype: bool
         """
-        if self.floating in ['user_on', 'auto_on']:
+        if self.floating in [True, 'user_on', 'auto_on']:
             return True
         return False
 
@@ -235,7 +234,7 @@ class Con:
         leaves = []
 
         for c in self:
-            if not c.nodes and c.type == "con" and c.parent.type != "dockarea":
+            if not c.nodes and c.type in ("con","floating_con") and c.parent.type != "dockarea":
                 leaves.append(c)
 
         return leaves

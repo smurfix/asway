@@ -11,6 +11,8 @@ i3ipc-python Documentation
    con
    aio-connection
    aio-con
+   anyio-connection
+   anyio-con
    events
    replies
 

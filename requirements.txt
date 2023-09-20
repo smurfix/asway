@@ -5,6 +5,7 @@ pytest-timeout
 
 yapf
 flake8
+blinker >= 1.6
 
 sphinx
 sphinxcontrib-asyncio

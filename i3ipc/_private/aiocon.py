@@ -1,4 +1,7 @@
 from .. import con
+from ..replies import CommandReply
+
+from typing import List
 
 class Con(con.Con):
     """A container of a window and child containers gotten from :func:`i3ipc.Connection.get_tree()` or events.

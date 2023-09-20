@@ -7,7 +7,9 @@ import os
 from setuptools import setup, find_packages
 
 REQUIRES_PYTHON = '>=3.4.0'
-REQUIRED = []
+REQUIRED = [
+    "blinker >=1.6",
+]
 EXTRAS = {}
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -33,6 +35,10 @@ setup(
     packages=find_packages(exclude=['test', '*.test', '*.test.*', 'test.*']),
     install_requires=REQUIRED,
     extras_require=EXTRAS,
+    tests_require=[
+        "trio >= 0.22",
+        "anyio >= 4",
+    ],
     include_package_data=True,
     license='BSD',
     keywords='i3 i3wm extensions add-ons',
