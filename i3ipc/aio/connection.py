@@ -3,7 +3,7 @@ from .._private.aiocon import Con
 from ..replies import (BarConfigReply, CommandReply, ConfigReply, OutputReply, TickReply,
                        VersionReply, WorkspaceReply, SeatReply, InputReply)
 from ..events import (IpcBaseEvent, BarconfigUpdateEvent, BindingEvent, OutputEvent, ShutdownEvent,
-                      WindowEvent, TickEvent, ModeEvent, WorkspaceEvent, InputEvent, Event)
+                      WindowEvent, TickEvent, ModeEvent, WorkspaceEvent, InputEvent, Event, SeatEvent)
 from .. import con
 import os
 import json
@@ -258,6 +258,8 @@ class Connection:
             event = TickEvent(message)
         elif event_type == EventType.INPUT:
             event = InputEvent(message)
+        elif event_type == EventType.SEAT:
+            event = SeatEvent(message)
         else:
             # we have not implemented this event
             return

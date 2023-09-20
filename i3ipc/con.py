@@ -92,10 +92,11 @@ class Con:
 
         # set simple properties
         ipc_properties = [
-            'border', 'current_border_width', 'floating', 'focus', 'focused', 'fullscreen_mode',
-            'id', 'layout', 'marks', 'name', 'num', 'orientation', 'percent', 'scratchpad_state',
-            'shell', 'sticky', 'type', 'urgent', 'window', 'pid', 'app_id', 'representation',
-            'visible'
+	    'border', 'current_border_width', 'floating', 'focus', 'focused',
+	    'focused_seats', 'fullscreen_mode', 'id', 'layout', 'marks',
+	    'name', 'num', 'orientation', 'percent', 'scratchpad_state',
+	    'shell', 'sticky', 'type', 'urgent', 'window', 'pid', 'app_id',
+	    'representation', 'visible', 'most_recent_seat',
         ]
         for attr in ipc_properties:
             setattr(self, attr, data.get(attr))

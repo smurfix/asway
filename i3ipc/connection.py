@@ -4,7 +4,7 @@ from .con import Con
 from .replies import (BarConfigReply, CommandReply, ConfigReply, OutputReply, TickReply,
                       VersionReply, WorkspaceReply, SeatReply, InputReply)
 from .events import (IpcBaseEvent, BarconfigUpdateEvent, BindingEvent, OutputEvent, ShutdownEvent,
-                     WindowEvent, TickEvent, ModeEvent, WorkspaceEvent, InputEvent, Event)
+                     WindowEvent, TickEvent, ModeEvent, WorkspaceEvent, InputEvent, Event, SeatEvent)
 from ._private import PubSub, MessageType, EventType, Synchronizer
 
 from typing import List, Optional, Union, Callable
@@ -369,6 +369,8 @@ class Connection:
             events_obj.append("tick")
         if events & EventType.INPUT.value:
             events_obj.append("input")
+        if events & EventType.SEAT.value:
+            events_obj.append("seat")
 
         try:
             self._sub_lock.acquire()
@@ -445,6 +447,8 @@ class Connection:
             event_type = EventType.TICK
         elif base_event == 'input':
             event_type = EventType.INPUT
+        elif base_event == 'seat':
+            event_type = EventType.SEAT
 
         if not event_type:
             raise Exception('event not implemented')
@@ -508,6 +512,9 @@ class Connection:
         elif msg_type == EventType.INPUT.value:
             event_name = 'input'
             event = InputEvent(data)
+        elif msg_type == EventType.SEAT.value:
+            event_name = 'seat'
+            event = SeatEvent(data)
         else:
             # we have not implemented this event
             return
