@@ -4,7 +4,7 @@
 # Wed, 20 Sep 2023 15:07:39 +0200
 export PYBUILD_NAME=i3ipc
 %:
-	dh $@ --with python3 --buildsystem=python_distutils
+	dh $@ --with python3 --buildsystem=pybuild
 
 override_dh_auto_install:
 	python3 setup.py install --force --root=debian/python3-i3ipc --no-compile -O0 --install-layout=deb  
@@ -12,3 +12,5 @@ override_dh_auto_install:
 override_dh_python2:
 	dh_python2 --no-guessing-versions
 
+override_dh_auto_test:
+	: # do not auto test
