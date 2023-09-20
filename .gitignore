@@ -60,3 +60,4 @@ target/
 .vscode/
 
 .pytest_cache
+/.pybuild/
