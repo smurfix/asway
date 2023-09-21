@@ -200,6 +200,9 @@ class BindingInfo:
         # not included in sway
         self.mods = data.get('mods', [])
 
+    def __repr__(self):
+        return f"Binding‹cmd={self.command !r} key={' '.join(self.event_state_mask+self.symbols)}›"
+
 
 class BindingEvent(IpcBaseEvent):
     """Sent when a configured command binding is triggered with the keyboard or
@@ -218,6 +221,9 @@ class BindingEvent(IpcBaseEvent):
         self.ipc_data = data
         self.change = data['change']
         self.binding = BindingInfo(data['binding'])
+
+    def __repr__(self):
+        return f"Binding‹cmd={self.command !r}›"
 
 
 class ShutdownEvent(IpcBaseEvent):
