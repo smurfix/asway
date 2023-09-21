@@ -279,6 +279,16 @@ class Connection:
             raise
         await self.subscribe(list(self._subscriptions), force=True)
 
+    
+    # allow omitting the ``.connect()``
+    async def __aenter__(self):
+        self.__ctx = ctx = self.connect()  # pylint: disable=E1101,W0201
+        return await ctx.__aenter__()
+
+    def __aexit__(self, *tb):
+        return self.__ctx.__aexit__(*tb)
+
+
     @asynccontextmanager
     async def connect(self) -> 'Connection':
         """Connects to the i3 ipc socket. This is an async context manager.
