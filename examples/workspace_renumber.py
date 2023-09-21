@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-import i3ipc
+import asway
 
 # make connection to i3 ipc
-i3 = i3ipc.Connection()
+i3 = asway.Connection()
 
 
 # check if workspaces are all in order

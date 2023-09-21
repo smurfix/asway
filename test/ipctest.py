@@ -1,7 +1,7 @@
 from subprocess import Popen
 import pytest
-import i3ipc
-from i3ipc import CommandReply
+import asway
+from asway import CommandReply
 import math
 from random import random
 import time
@@ -19,7 +19,7 @@ class IpcTest:
 
         while True:
             try:
-                IpcTest.i3_conn = i3ipc.Connection()
+                IpcTest.i3_conn = asway.Connection()
                 break
             except Exception:
                 tries += 1

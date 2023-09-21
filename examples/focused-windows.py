@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 from argparse import ArgumentParser
-import i3ipc
+import asway
 
-i3 = i3ipc.Connection()
+i3 = asway.Connection()
 
 
 def focused_windows():

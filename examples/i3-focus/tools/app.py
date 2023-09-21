@@ -1,5 +1,5 @@
 import re
-import i3ipc
+import asway
 
 
 class App:

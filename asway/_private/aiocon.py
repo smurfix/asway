@@ -4,7 +4,7 @@ from ..replies import CommandReply
 from typing import List
 
 class Con(con.Con):
-    """A container of a window and child containers gotten from :func:`i3ipc.Connection.get_tree()` or events.
+    """A container of a window and child containers gotten from :func:`asway.Connection.get_tree()` or events.
 
     .. seealso:: https://i3wm.org/docs/ipc.html#_tree_reply
 
@@ -47,9 +47,9 @@ class Con(con.Con):
     :ivar window:
     :vartype window: int
     :ivar nodes:
-    :vartype nodes: list(:class:`Con <i3ipc.Con>`)
+    :vartype nodes: list(:class:`Con <asway.Con>`)
     :ivar floating_nodes:
-    :vartype floating_nodes: list(:class:`Con <i3ipc.Con>`)
+    :vartype floating_nodes: list(:class:`Con <asway.Con>`)
     :ivar window_class:
     :vartype window_class: str
     :ivar window_instance:
@@ -59,17 +59,17 @@ class Con(con.Con):
     :ivar window_title:
     :vartype window_title: str
     :ivar rect:
-    :vartype rect: :class:`Rect <i3ipc.Rect>`
+    :vartype rect: :class:`Rect <asway.Rect>`
     :ivar window_rect:
-    :vartype window_rect: :class:`Rect <i3ipc.Rect>`
+    :vartype window_rect: :class:`Rect <asway.Rect>`
     :ivar deco_rect:
-    :vartype deco_rect: :class:`Rect <i3ipc.Rect>`
+    :vartype deco_rect: :class:`Rect <asway.Rect>`
     :ivar app_id: (sway only)
     :vartype app_id: str
     :ivar pid: (sway only)
     :vartype pid: int
     :ivar gaps: (gaps only)
-    :vartype gaps: :class:`Gaps <i3ipc.Gaps>`
+    :vartype gaps: :class:`Gaps <asway.Gaps>`
 
     :ivar ipc_data: The raw data from the i3 ipc.
     :vartype ipc_data: dict

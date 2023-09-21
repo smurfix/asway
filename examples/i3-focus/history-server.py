@@ -6,7 +6,7 @@ import selectors
 import threading
 import json
 from argparse import ArgumentParser
-import i3ipc
+import asway
 
 MAX_WIN_HISTORY = 15
 
@@ -17,9 +17,9 @@ parser.add_argument('--socket-file', default='/tmp/i3-app-focus.socket', help='S
 
 class FocusWatcher:
     def __init__(self):
-        self.i3 = i3ipc.Connection()
-        self.i3.on(i3ipc.Event.WINDOW_FOCUS, self._on_window_focus)
-        self.i3.on(i3ipc.Event.WINDOW_CLOSE, self._on_window_close)
+        self.i3 = asway.Connection()
+        self.i3.on(asway.Event.WINDOW_FOCUS, self._on_window_focus)
+        self.i3.on(asway.Event.WINDOW_CLOSE, self._on_window_close)
         self.listening_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         if os.path.exists(args.socket_file):
             os.remove(args.socket_file)

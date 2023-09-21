@@ -1,14 +1,14 @@
 Con
 ===
 
-.. autoclass:: i3ipc.Con
+.. autoclass:: asway.Con
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.Rect
+.. autoclass:: asway.Rect
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.Gaps
+.. autoclass:: asway.Gaps
    :members:
    :undoc-members:

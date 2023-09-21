@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# This module is an example of how to use i3ipc with asyncio event loop. It
+# This module is an example of how to use asway with asyncio event loop. It
 # implements an i3status wrapper that handles a special keybinding to switch
 # keyboard layout, while also displaying current layout in i3bar.
 #
@@ -15,7 +15,7 @@ import subprocess
 import sys
 import tempfile
 
-import i3ipc
+import asway
 
 configure_i3_status = False
 try:
@@ -134,7 +134,7 @@ class Status(object):
 
 status = Status()
 
-i3 = i3ipc.Connection()
+i3 = asway.Connection()
 i3.on('binding::run', lambda i3, e: status.dispatch_command(e.binding.command))
 i3.event_socket_setup()
 loop = asyncio.get_event_loop()

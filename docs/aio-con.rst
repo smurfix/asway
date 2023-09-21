@@ -1,7 +1,7 @@
 aio.Con
 =======
 
-.. autoclass:: i3ipc.aio.Con
+.. autoclass:: asway.aio.Con
    :members:
    :undoc-members:
    :inherited-members:

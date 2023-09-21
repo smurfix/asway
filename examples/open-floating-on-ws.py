@@ -15,9 +15,9 @@ def is_ws_floating(name):
     return False
 
 
-import i3ipc
+import asway
 
-i3 = i3ipc.Connection()
+i3 = asway.Connection()
 
 
 def on_window_open(i3, e):

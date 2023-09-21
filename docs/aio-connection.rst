@@ -1,6 +1,6 @@
 aio.Connection
 ==============
 
-.. autoclass:: i3ipc.aio.Connection
+.. autoclass:: asway.aio.Connection
    :members:
    :undoc-members:

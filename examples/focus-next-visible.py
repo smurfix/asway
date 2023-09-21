@@ -21,7 +21,7 @@ from sys import argv
 from itertools import cycle
 from subprocess import check_output
 
-import i3ipc
+import asway
 
 
 def get_windows_on_ws(conn):
@@ -45,7 +45,7 @@ def find_visible_windows(windows_on_workspace):
 
 if __name__ == '__main__':
 
-    conn = i3ipc.Connection()
+    conn = asway.Connection()
 
     visible_windows = find_visible_windows(get_windows_on_ws(conn))
 

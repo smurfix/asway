@@ -9,9 +9,9 @@
 from argparse import ArgumentParser
 from subprocess import check_output
 from os.path import basename
-import i3ipc
+import asway
 
-i3 = i3ipc.Connection()
+i3 = asway.Connection()
 
 parser = ArgumentParser(prog='i3-container-commander.py',
                         description='''

@@ -1,5 +1,5 @@
 from .ipctest import IpcTest
-from i3ipc import Event
+from asway import Event
 
 import pytest
 import asyncio

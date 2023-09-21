@@ -144,7 +144,7 @@ class Connection:
     listening to events.
 
     The ``Connection`` class is the entry point into all features of the
-    library.  :func:`connect() <i3ipc.aio.Connection.connect>` is an async
+    library.  :func:`connect() <asway.aio.Connection.connect>` is an async
     context manager. The connection is only useable within the context.
 
     :Example:
@@ -383,12 +383,12 @@ class Connection:
     async def subscribe(self, events: Union[List[Event], List[str]], force: bool = False):
         """Send a ``SUBSCRIBE`` command to the ipc subscription connection and
         await the result. To attach event handlers, use :func:`Connection.on()
-        <i3ipc.aio.Connection.on()>`. Calling this is only needed if you want
+        <asway.aio.Connection.on()>`. Calling this is only needed if you want
         to be notified when events will start coming in.
 
         :ivar events: A list of events to subscribe to. Currently you cannot
             subscribe to detailed events.
-        :vartype events: list(:class:`Event <i3ipc.Event>`) or list(str)
+        :vartype events: list(:class:`Event <asway.Event>`) or list(str)
         :ivar force: If ``False``, the message will not be sent if this
             connection is already subscribed to the event.
         :vartype force: bool
@@ -443,7 +443,7 @@ class Connection:
         the i3 ipc.
 
         :param event: The event to subscribe to.
-        :type event: :class:`Event <i3ipc.Event>` or str
+        :type event: :class:`Event <asway.Event>` or str
         :param handler: The event handler to call.
         :type handler: :class:`Callable`
         """
@@ -481,7 +481,7 @@ class Connection:
         :type cmd: str
         :returns: A list of replies that contain info for the result of each
             command given.
-        :rtype: list(:class:`CommandReply <i3ipc.CommandReply>`)
+        :rtype: list(:class:`CommandReply <asway.CommandReply>`)
         """
         data = await self._message(MessageType.COMMAND, cmd)
 
@@ -495,7 +495,7 @@ class Connection:
         """Gets the i3 version.
 
         :returns: The i3 version.
-        :rtype: :class:`i3ipc.VersionReply`
+        :rtype: :class:`asway.VersionReply`
         """
         data = await self._message(MessageType.GET_VERSION)
         data = json.loads(data)
@@ -518,7 +518,7 @@ class Connection:
         :type bar_id: str
 
         :returns: The bar configuration for the bar id.
-        :rtype: :class:`BarConfigReply <i3ipc.BarConfigReply>` or :class:`None`
+        :rtype: :class:`BarConfigReply <asway.BarConfigReply>` or :class:`None`
             if no bar configuration is found.
         """
         if not bar_id:
@@ -535,7 +535,7 @@ class Connection:
         """Gets the list of current outputs.
 
         :returns: A list of current outputs.
-        :rtype: list(:class:`i3ipc.OutputReply`)
+        :rtype: list(:class:`asway.OutputReply`)
         """
         data = await self._message(MessageType.GET_OUTPUTS)
         data = json.loads(data)
@@ -545,7 +545,7 @@ class Connection:
         """Gets the list of current workspaces.
 
         :returns: A list of current workspaces
-        :rtype: list(:class:`i3ipc.WorkspaceReply`)
+        :rtype: list(:class:`asway.WorkspaceReply`)
         """
         data = await self._message(MessageType.GET_WORKSPACES)
         data = json.loads(data)
@@ -564,7 +564,7 @@ class Connection:
         """Gets the root container of the i3 layout tree.
 
         :returns: The root container of the i3 layout tree.
-        :rtype: :class:`i3ipc.Con`
+        :rtype: :class:`asway.Con`
         """
         return Con(await self.get_raw_tree(), None, self)
 
@@ -590,7 +590,7 @@ class Connection:
         """Returns the last loaded i3 config.
 
         :returns: A class containing the config.
-        :rtype: :class:`i3ipc.ConfigReply`
+        :rtype: :class:`asway.ConfigReply`
         """
         data = await self._message(MessageType.GET_CONFIG)
         data = json.loads(data)
@@ -600,7 +600,7 @@ class Connection:
         """Sends a tick with the specified payload.
 
         :returns: The reply to the tick command
-        :rtype: :class:`i3ipc.TickReply`
+        :rtype: :class:`asway.TickReply`
         """
         data = await self._message(MessageType.SEND_TICK, payload)
         data = json.loads(data)
@@ -610,7 +610,7 @@ class Connection:
         """(sway only) Gets the inputs connected to the compositor.
 
         :returns: The reply to the inputs command
-        :rtype: list(:class:`i3ipc.InputReply`)
+        :rtype: list(:class:`asway.InputReply`)
         """
         data = await self._message(MessageType.GET_INPUTS)
         data = json.loads(data)
@@ -620,7 +620,7 @@ class Connection:
         """(sway only) Gets the seats configured on the compositor
 
         :returns: The reply to the seats command
-        :rtype: list(:class:`i3ipc.SeatReply`)
+        :rtype: list(:class:`asway.SeatReply`)
         """
         data = await self._message(MessageType.GET_SEATS)
         data = json.loads(data)

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import i3ipc
+import asway
 from argparse import ArgumentParser
 from subprocess import check_output, Popen, CalledProcessError
 from sys import exit
@@ -26,7 +26,7 @@ try:
 except FileNotFoundError:
     pass
 
-i3 = i3ipc.Connection()
+i3 = asway.Connection()
 
 (args, menu_args) = parser.parse_known_args()
 

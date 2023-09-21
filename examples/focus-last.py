@@ -6,7 +6,7 @@ import selectors
 import tempfile
 import threading
 from argparse import ArgumentParser
-import i3ipc
+import asway
 
 SOCKET_DIR = '{}/i3_focus_last.{}{}'.format(tempfile.gettempdir(), os.geteuid(),
                                             os.getenv("DISPLAY"))
@@ -16,7 +16,7 @@ MAX_WIN_HISTORY = 15
 
 class FocusWatcher:
     def __init__(self):
-        self.i3 = i3ipc.Connection()
+        self.i3 = asway.Connection()
         self.i3.on('window::focus', self.on_window_focus)
         # Make a directory with permissions that restrict access to
         # the user only.

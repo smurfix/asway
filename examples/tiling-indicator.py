@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-import i3ipc
+import asway
 
-i3 = i3ipc.Connection()
+i3 = asway.Connection()
 splitv_text = 'V'
 splith_text = 'H'
 last = ''

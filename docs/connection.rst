@@ -1,6 +1,6 @@
 Connection
 ==========
 
-.. autoclass:: i3ipc.Connection
+.. autoclass:: asway.Connection
    :members:
    :undoc-members:

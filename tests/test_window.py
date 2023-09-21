@@ -1,6 +1,6 @@
 from .ipctest import i3
 
-from asynci3 import Event
+from asway import Event
 
 import pytest
 import anyio

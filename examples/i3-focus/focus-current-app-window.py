@@ -3,7 +3,7 @@
 import re
 from argparse import ArgumentParser
 from functools import reduce
-import i3ipc
+import asway
 from tools import App, Lists, Menu, Sockets
 
 parser = ArgumentParser(prog='i3-app-focus.py',
@@ -22,6 +22,6 @@ containers_info = sockets.get_containers_history()
 
 containers_info_by_focused_app = Lists.find_all_by_focused_app(containers_info)
 
-i3 = i3ipc.Connection()
+i3 = asway.Connection()
 menu = Menu(i3, args.menu, menu_args)
 menu.show_menu_container_info(containers_info_by_focused_app)

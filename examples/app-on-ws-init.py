@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 from argparse import ArgumentParser
-import i3ipc
+import asway
 
-i3 = i3ipc.Connection()
+i3 = asway.Connection()
 
 parser = ArgumentParser(description="""Open the given application each time the
     given workspace is created. For instance, running 'app-on-ws-init.py 6

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import i3ipc
+import asway
 import re
 from argparse import ArgumentParser
 
@@ -11,7 +11,7 @@ def main():
     ''')
     parser.parse_args()
 
-    i3 = i3ipc.Connection()
+    i3 = asway.Connection()
 
     workspaces = i3.get_workspaces()
     numbered_workspaces = filter(lambda w: w.name[0].isdigit(), workspaces)

@@ -1,4 +1,4 @@
-# please also check http://pypi.debian.net/i3ipc/watch
+# please also check http://pypi.debian.net/asway/watch
 version=3
 opts=uversionmangle=s/(rc|a|b|c)/~$1/ \
-http://pypi.debian.net/i3ipc/i3ipc-(.+)\.(?:zip|tgz|tbz|txz|(?:tar\.(?:gz|bz2|xz)))
+http://pypi.debian.net/asway/asway-(.+)\.(?:zip|tgz|tbz|txz|(?:tar\.(?:gz|bz2|xz)))

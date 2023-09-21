@@ -11,7 +11,7 @@
 # https://github.com/i3/i3/pull/3188
 # https://old.reddit.com/r/i3wm/comments/85ctji/when_windows_are_floating_by_default_how_do_i/
 
-from i3ipc import Connection
+from asway import Connection
 
 i3 = Connection()
 

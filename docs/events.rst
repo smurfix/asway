@@ -1,46 +1,46 @@
 Events
 ======
 
-.. autoclass:: i3ipc.Event
+.. autoclass:: asway.Event
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.WorkspaceEvent
+.. autoclass:: asway.WorkspaceEvent
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.WindowEvent
+.. autoclass:: asway.WindowEvent
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.BarconfigUpdateEvent
+.. autoclass:: asway.BarconfigUpdateEvent
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.BindingInfo
+.. autoclass:: asway.BindingInfo
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.BindingEvent
+.. autoclass:: asway.BindingEvent
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.TickEvent
+.. autoclass:: asway.TickEvent
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.ModeEvent
+.. autoclass:: asway.ModeEvent
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.OutputEvent
+.. autoclass:: asway.OutputEvent
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.ShutdownEvent
+.. autoclass:: asway.ShutdownEvent
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.InputEvent
+.. autoclass:: asway.InputEvent
    :members:
    :undoc-members:

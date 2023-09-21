@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import i3ipc
+import asway
 from curses import wrapper
 
 
@@ -48,7 +48,7 @@ last_txt = ''
 
 
 def main(stdscr):
-    ipc = i3ipc.Connection()
+    ipc = asway.Connection()
 
     def on_event(ipc, e):
         txt = ''

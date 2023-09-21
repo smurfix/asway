@@ -1,38 +1,38 @@
 Replies
 =======
 
-.. autoclass:: i3ipc.CommandReply
+.. autoclass:: asway.CommandReply
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.VersionReply
+.. autoclass:: asway.VersionReply
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.BarConfigReply
+.. autoclass:: asway.BarConfigReply
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.OutputReply
+.. autoclass:: asway.OutputReply
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.InputReply
+.. autoclass:: asway.InputReply
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.SeatReply
+.. autoclass:: asway.SeatReply
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.WorkspaceReply
+.. autoclass:: asway.WorkspaceReply
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.TickReply
+.. autoclass:: asway.TickReply
    :members:
    :undoc-members:
 
-.. autoclass:: i3ipc.ConfigReply
+.. autoclass:: asway.ConfigReply
    :members:
    :undoc-members:

@@ -3,7 +3,7 @@ from subprocess import Popen
 import pytest
 import anyio
 
-from asynci3 import Connection, CommandReply
+from asway import Connection, CommandReply
 
 import math
 import os,sys
@@ -19,7 +19,7 @@ class IpcTest:
 
     @asynccontextmanager
     async def run(self):
-        sock = os.environ["SWAYSOCK"] = os.environ["I3SOCK"] = f"{TMP}/asynci3-test-{os.getpid()}"
+        sock = os.environ["SWAYSOCK"] = os.environ["I3SOCK"] = f"{TMP}/asway-test-{os.getpid()}"
 
         try:
             p = 'sway' if SWAY else 'i3'

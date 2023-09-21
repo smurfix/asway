@@ -1,6 +1,6 @@
 from .ipctest import i3
 
-from asynci3 import (VersionReply, BarConfigReply, OutputReply, WorkspaceReply, ConfigReply,
+from asway import (VersionReply, BarConfigReply, OutputReply, WorkspaceReply, ConfigReply,
                    TickReply, Con)
 
 import pytest

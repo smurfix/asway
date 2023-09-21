@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-import i3ipc
+import asway
 from time import strftime, gmtime
 
-i3 = i3ipc.Connection()
+i3 = asway.Connection()
 
 
 def print_separator():

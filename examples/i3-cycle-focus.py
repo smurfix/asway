@@ -10,7 +10,7 @@ import asyncio
 from argparse import ArgumentParser
 import logging
 
-from i3ipc.aio import Connection
+from asway.aio import Connection
 
 SOCKET_FILE = '/tmp/.i3-cycle-focus.sock'
 MAX_WIN_HISTORY = 16

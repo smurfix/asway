@@ -82,7 +82,7 @@ def run_pytest(display):
     env = os.environ.copy()
     env['DISPLAY'] = ':%d' % display
     env['PYTHONPATH'] = here
-    env['I3SOCK'] = '/tmp/i3ipc-test-sock-{display}'.format(display=display)
+    env['I3SOCK'] = '/tmp/asway-test-sock-{display}'.format(display=display)
     return subprocess.run(cmd + sys.argv[1:], env=env)
 
 

@@ -2,7 +2,7 @@ from .ipctest import i3
 
 import pytest
 import anyio
-from asynci3 import Event, TickEvent
+from asway import Event, TickEvent
 
 
 class TestWorkspace:

@@ -2,9 +2,9 @@
 
 from argparse import ArgumentParser
 from subprocess import call
-import i3ipc
+import asway
 
-i3 = i3ipc.Connection()
+i3 = asway.Connection()
 
 parser = ArgumentParser(prog='disable-standby-fs',
                         description='''

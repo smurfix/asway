@@ -1,8 +1,8 @@
 from .ipctest import IpcTest
 
-from i3ipc import (VersionReply, BarConfigReply, OutputReply, WorkspaceReply, ConfigReply,
+from asway import (VersionReply, BarConfigReply, OutputReply, WorkspaceReply, ConfigReply,
                    TickReply)
-from i3ipc.aio import Con
+from asway.aio import Con
 
 import pytest
 

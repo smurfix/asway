@@ -12,7 +12,7 @@ License: GPLv3
 """
 
 import atexit
-import i3ipc
+import asway
 import psutil
 from argparse import ArgumentParser
 
@@ -23,7 +23,7 @@ class FocusMonitor(object):
         self.class_name = args.class_name
         self.process_name = args.process_name
         self.debug = args.debug
-        self.conn = i3ipc.Connection()
+        self.conn = asway.Connection()
         self.conn.on('window::focus', self.focus_change)
         atexit.register(self.continue_at_exit)
 

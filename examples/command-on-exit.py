@@ -8,14 +8,14 @@
 COMMAND = ['echo', 'hello, world']
 
 from subprocess import Popen
-import i3ipc
+import asway
 
 
 def on_shutdown(i3):
     Popen(COMMAND)
 
 
-i3 = i3ipc.Connection()
+i3 = asway.Connection()
 
 i3.on('ipc_shutdown', on_shutdown)
 

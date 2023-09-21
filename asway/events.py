@@ -210,7 +210,7 @@ class BindingEvent(IpcBaseEvent):
     :ivar change: The type of change.
     :vartype change: str
     :ivar binding: Contains details about the binding that was run.
-    :vartype binding: :class:`BindingInfo <i3ipc.BindingInfo>`
+    :vartype binding: :class:`BindingInfo <asway.BindingInfo>`
     :ivar ipc_data: The raw data from the i3 ipc.
     :vartype ipc_data: dict
     """
@@ -264,7 +264,7 @@ class InputEvent(IpcBaseEvent):
     :ivar change: The type of change ("added" or "removed")
     :vartype change: str
     :ivar input: Information about the input that changed.
-    :vartype input: :class:`InputReply <i3ipc.InputReply>`
+    :vartype input: :class:`InputReply <asway.InputReply>`
     :ivar ipc_data: The raw data from the i3 ipc.
     :vartype ipc_data: dict
     """

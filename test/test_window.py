@@ -1,4 +1,4 @@
-from i3ipc import Event
+from asway import Event
 
 import time
 from ipctest import IpcTest

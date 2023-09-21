@@ -7,7 +7,7 @@
 
 from itertools import cycle
 from subprocess import check_output
-import i3ipc
+import asway
 
 
 def get_windows_on_ws(conn):
@@ -43,7 +43,7 @@ NOTE: maybe add optionals `w_first` and `w_last`"""
 
 
 def main(args):
-    conn = i3ipc.Connection()
+    conn = asway.Connection()
 
     workspace = workspace_by_name(conn, args.workspace)  # Find workspace.
     if workspace is None:

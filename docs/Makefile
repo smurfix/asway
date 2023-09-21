@@ -227,4 +227,4 @@ dummy:
 
 .PHONY: serve
 serve:
-	sphinx-autobuild -b html $(ALLSPINXOPTS) --watch ../i3ipc . $(BUILDDIR)/html
+	sphinx-autobuild -b html $(ALLSPINXOPTS) --watch ../asway . $(BUILDDIR)/html

@@ -1,8 +1,8 @@
 from subprocess import Popen
 import pytest
 
-from i3ipc.aio import Connection
-from i3ipc import CommandReply
+from asway.aio import Connection
+from asway import CommandReply
 
 import math
 from random import random
