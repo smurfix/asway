@@ -2,12 +2,11 @@
 
 from argparse import ArgumentParser
 import asway
+import asyncclick as click
 
-i3 = asway.Connection()
 
-
-def focused_windows():
-    tree = i3.get_tree()
+async def focused_windows(i3):
+    tree = await i3.get_tree()
 
     workspaces = tree.workspaces()
     for workspace in workspaces:
@@ -26,9 +25,9 @@ def focused_windows():
 
             print('WS', wsname + ':', coname)
 
-
+@click.command(help='Print the names of the focused window of each workspace.')
+async def main():
+    async with asway.Connection() as i3:
+        await focused_windows(i3)
 if __name__ == '__main__':
-    parser = ArgumentParser(description='Print the names of the focused window of each workspace.')
-    parser.parse_args()
-
-    focused_windows()
+    main()

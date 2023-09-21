@@ -6,18 +6,19 @@
 #     bindsym $mod1+Tab exec --no-startup-id i3-cycle-focus.py --switch
 
 import os
-import asyncio
+import anyio
 from argparse import ArgumentParser
 import logging
 
-from asway.aio import Connection
+from asway import Connection
+import asyncclick as click
 
 SOCKET_FILE = '/tmp/.i3-cycle-focus.sock'
 MAX_WIN_HISTORY = 16
 UPDATE_DELAY = 2.0
 
 
-def on_shutdown(i3_conn, e):
+def on_shutdown(e):
     os._exit(0)
 
 
@@ -28,32 +29,29 @@ class FocusWatcher:
         self.update_task = None
         self.window_index = 1
 
-    async def connect(self):
-        self.i3 = await Connection().connect()
-        self.i3.on('window::focus', self.on_window_focus)
-        self.i3.on('shutdown', on_shutdown)
+    async def update_window_list(self, window_id, *, task_status):
+        with anyio.CancelScope() as sc:
+            task_status.started(sc)
+            await anyio.sleep(UPDATE_DELAY)  # yes even if it is zero
+            self.update_task = None
 
-    async def update_window_list(self, window_id):
-        if UPDATE_DELAY != 0.0:
-            await asyncio.sleep(UPDATE_DELAY)
+            logging.info('updating window list')
+            if window_id in self.window_list:
+                self.window_list.remove(window_id)
 
-        logging.info('updating window list')
-        if window_id in self.window_list:
-            self.window_list.remove(window_id)
+            self.window_list.insert(0, window_id)
 
-        self.window_list.insert(0, window_id)
+            if len(self.window_list) > MAX_WIN_HISTORY:
+                del self.window_list[MAX_WIN_HISTORY:]
 
-        if len(self.window_list) > MAX_WIN_HISTORY:
-            del self.window_list[MAX_WIN_HISTORY:]
-
-        self.window_index = 1
-        logging.info('new window list: {}'.format(self.window_list))
+            self.window_index = 1
+            logging.info('new window list: {}'.format(self.window_list))
 
     async def get_valid_windows(self):
         tree = await self.i3.get_tree()
-        if args.active_workspace:
+        if active_workspace:
             return set(w.id for w in tree.find_focused().workspace().leaves())
-        elif args.visible_workspaces:
+        elif visible_workspaces:
             ws_list = []
             w_set = set()
             outputs = await self.i3.get_outputs()
@@ -68,10 +66,10 @@ class FocusWatcher:
         else:
             return set(w.id for w in tree.leaves())
 
-    async def on_window_focus(self, i3conn, event):
+    async def on_window_focus(self, event):
         logging.info('got window focus event')
-        if args.ignore_float and (event.container.floating == "user_on"
-                                  or event.container.floating == "auto_on"):
+        if ignore_floating and (event.container.floating == "user_on"
+                                     or event.container.floating == "auto_on"):
             logging.info('not handling this floating window')
             return
 
@@ -79,12 +77,19 @@ class FocusWatcher:
             self.update_task.cancel()
 
         logging.info('scheduling task to update window list')
-        self.update_task = asyncio.create_task(self.update_window_list(event.container.id))
+        self.update_task = await self.tg.start(self.update_window_list, event.container.id)
 
     async def run(self):
-        async def handle_switch(reader, writer):
-            data = await reader.read(1024)
-            logging.info('received data: {}'.format(data))
+        async with Connection() as self.i3:
+            self.i3.on('window::focus', self.on_window_focus)
+            self.i3.on('shutdown', on_shutdown)
+            listener = await anyio.create_unix_listener(SOCKET_FILE)
+            await listener.serve(self._handle_switch)
+
+    async def _handle_switch(self, conn):
+        async with conn:
+            data = await conn.receive(1024)
+            logging.info('received data: %r',data)
             if data == b'switch':
                 logging.info('switching window')
                 windows = await self.get_valid_windows()
@@ -101,30 +106,20 @@ class FocusWatcher:
                         await self.i3.command('[con_id={}] focus'.format(window_id))
                         break
 
-        server = await asyncio.start_unix_server(handle_switch, SOCKET_FILE)
-        await server.serve_forever()
-
 
 async def send_switch():
-    reader, writer = await asyncio.open_unix_connection(SOCKET_FILE)
-
-    logging.info('sending switch message')
-    writer.write('switch'.encode())
-    await writer.drain()
-
-    logging.info('closing the connection')
-    writer.close()
-    await writer.wait_closed()
+    async with await anyio.connect_unix(SOCKET_FILE) as client:
+        logging.info('sending switch message')
+        await client.send('switch'.encode())
+        logging.info('closing the connection')
 
 
 async def run_server():
     focus_watcher = FocusWatcher()
-    await focus_watcher.connect()
     await focus_watcher.run()
 
 
-if __name__ == '__main__':
-    parser = ArgumentParser(prog='i3-cycle-focus.py',
+@click.command(prog='i3-cycle-focus.py',
                             description="""
         Cycle backwards through the history of focused windows (aka Alt-Tab).
         This script should be launched from ~/.xsession or ~/.xinitrc.
@@ -133,57 +128,44 @@ if __name__ == '__main__':
         Use the `--delay` option to set the delay between focusing the
         selected window and updating the focus history (Default 2.0 seconds).
         Use a value of 0.0 seconds to toggle focus only between the current
-        and the previously focused window. Use the `--ignore-floating` option
-        to exclude all floating windows when cycling and updating the focus
-        history. Use the `--visible-workspaces` option to include windows on
+        and the previously focused window.
+        se the `--visible-workspaces` option to include windows on
         visible workspaces only when cycling the focus history. Use the
         `--active-workspace` option to include windows on the active workspace
         only when cycling the focus history.
 
         To trigger focus switching, execute the script from a keybinding with
         the `--switch` option.""")
-    parser.add_argument('--history',
-                        dest='history',
+@click.option('--history',
                         help='Maximum number of windows in the focus history',
                         type=int)
-    parser.add_argument('--delay',
-                        dest='delay',
+@click.option('--delay',
                         help='Delay before updating focus history',
                         type=float)
-    parser.add_argument('--ignore-floating',
-                        dest='ignore_float',
+@click.option('--ignore-floating',
                         action='store_true',
-                        help='Ignore floating windows '
-                        'when cycling and updating the focus history')
-    parser.add_argument('--visible-workspaces',
-                        dest='visible_workspaces',
+                        help='Ignore floating windows')
+@click.option('--visible-workspaces',
                         action='store_true',
-                        help='Include windows on visible '
-                        'workspaces only when cycling the focus history')
-    parser.add_argument('--active-workspace',
-                        dest='active_workspace',
+                        help='Include only windows on visible workspaces')
+@click.option('--active-workspace',
                         action='store_true',
-                        help='Include windows on the '
-                        'active workspace only when cycling the focus history')
-    parser.add_argument('--switch',
-                        dest='switch',
-                        action='store_true',
-                        help='Switch to the previous window',
-                        default=False)
-    parser.add_argument('--debug', dest='debug', action='store_true', help='Turn on debug logging')
-    args = parser.parse_args()
+                        help='Include only windows on the active workspace')
+@click.option('--switch',
+                        is_flag=True,
+                        help='Switch to the previous window')
+@click.option('--debug', is_flag=True, help='Turn on debug logging')
+async def main(history, delay, ignore_floating, visible_workspaces, active_workspace, switch, debug):
+    logging.basicConfig(level=logging.DEBUG if debug else logging.WARNING)
 
-    if args.debug:
-        logging.basicConfig(level=logging.DEBUG)
-
-    if args.history:
-        MAX_WIN_HISTORY = args.history
-    if args.delay:
-        UPDATE_DELAY = args.delay
+    if history:
+        MAX_WIN_HISTORY = history
+    if delay:
+        UPDATE_DELAY = delay
     else:
-        if args.delay == 0.0:
-            UPDATE_DELAY = args.delay
-    if args.switch:
-        asyncio.run(send_switch())
+        if delay == 0.0:
+            UPDATE_DELAY = delay
+    if switch:
+        await send_switch()
     else:
-        asyncio.run(run_server())
+        await run_server()

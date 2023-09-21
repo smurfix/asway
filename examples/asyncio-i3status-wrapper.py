@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# This module is an example of how to use asway with asyncio event loop. It
+# This module is an example of how to use asway. It
 # implements an i3status wrapper that handles a special keybinding to switch
 # keyboard layout, while also displaying current layout in i3bar.
 #
@@ -8,13 +8,12 @@
 #
 #       bindsym KEYS nop switch_layout
 
-import asyncio
 import collections
 import json
 import subprocess
 import sys
 import tempfile
-
+import asyncclick as click
 import asway
 
 configure_i3_status = False
@@ -72,17 +71,17 @@ class Status(object):
         # shown before other data
         self.switch_layout()
 
-    def switch_layout(self):
+    async def switch_layout(self):
         self.current_layout = (self.current_layout + 1) % len(self.layouts)
         new_layout = self.layouts[self.current_layout]
-        subprocess.call('setxkbmap {}'.format(new_layout), shell=True)
+        await anyio.run_process(['setxkbmap', new_layout])
         self.update([{'name': 'keyboard_layout', 'markup': 'none', 'full_text': new_layout}])
 
-    def dispatch_command(self, command):
+    async def dispatch_command(self, command):
         c = command.split(' ')
         if (len(c) < 2 or c[0] != 'nop' or c[1] not in self.command_handlers):
             return
-        self.command_handlers[c[1]]()
+        await self.command_handlers[c[1]]()
         self.repaint()
 
     def merge(self, status_update):
@@ -102,41 +101,39 @@ class Status(object):
         sys.stdout.write('\n')
         sys.stdout.flush()
 
-    @asyncio.coroutine
-    def i3status_reader(self):
+    async def i3status_reader(self):
+        from anyio.streams.text import TextReceiveStream
+
         def handle_i3status_payload(line):
             self.update(json.loads(line))
             self.repaint()
 
+        proc_cmd = ["i3status"]
         if configure_i3_status:
             # use a custom i3 status configuration to ensure we get json output
             cfg_file = tempfile.NamedTemporaryFile(mode='w+b')
             cfg_file.write(I3STATUS_CFG.encode('utf8'))
             cfg_file.flush()
-            create = asyncio.create_subprocess_exec('i3status',
-                                                    '-c',
-                                                    cfg_file.name,
-                                                    stdout=asyncio.subprocess.PIPE)
-        else:
-            create = asyncio.create_subprocess_exec('i3status', stdout=asyncio.subprocess.PIPE)
-        i3status = yield from create
-        # forward first line, version information
-        sys.stdout.write((yield from i3status.stdout.readline()).decode('utf8'))
-        # forward second line, an opening list bracket (no idea why this
-        # exists)
-        sys.stdout.write((yield from i3status.stdout.readline()).decode('utf8'))
-        # third line is a json payload
-        handle_i3status_payload((yield from i3status.stdout.readline()).decode('utf8'))
-        while True:
-            # all subsequent lines are json payload with a leading comma
-            handle_i3status_payload((yield from i3status.stdout.readline()).decode('utf8')[1:])
+            proc_cmd.extend(['-c', cfg_file.name])
+        async with await anyio.open_process(proc_cmd) as proc:
+            lines = aiter(TextReceiveStream(process.stdout))
+            # forward first line, version information
+            sys.stdout.write(await anext(lines))
+            # forward second line, an opening list bracket (no idea why this
+            # exists)
+            sys.stdout.write(await anext(lines))
+            # third line is a json payload
+            handle_i3status_payload(await anext(lines))
+            for l in lines:
+                # all subsequent lines are json payload with a leading comma
+                handle_i3status_payload((await anext(lines))[1:])
 
+@click.command()
+async def main():
+    async with asway.Connection() as i3:
+        status = Status(i3)
+        i3.on('binding::run', lambda e: status.dispatch_command(e.binding.command))
+        await status.i3status_reader()
 
-status = Status()
-
-i3 = asway.Connection()
-i3.on('binding::run', lambda i3, e: status.dispatch_command(e.binding.command))
-i3.event_socket_setup()
-loop = asyncio.get_event_loop()
-loop.add_reader(i3.sub_socket, lambda: i3.event_socket_poll())
-loop.run_until_complete(status.i3status_reader())
+if __name__ == "__main__":
+    main()

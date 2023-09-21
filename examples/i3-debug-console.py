@@ -2,7 +2,7 @@
 
 import asway
 from curses import wrapper
-
+import anyio
 
 def con_type_to_text(con):
     if con.type != 'con':
@@ -47,34 +47,37 @@ def container_to_text(con, indent):
 last_txt = ''
 
 
-def main(stdscr):
-    ipc = asway.Connection()
+async def main(stdscr):
+    async with asway.Connection() as ipc:
 
-    def on_event(ipc, e):
-        txt = ''
-        for ws in ipc.get_tree().workspaces():
-            txt += container_to_text(ws, 0) + '\n'
+        def on_event(e):
+            txt = ''
+            for ws in (await ipc.get_tree()).workspaces():
+                txt += container_to_text(ws, 0) + '\n'
 
-        global last_txt
-        if txt == last_txt:
-            return
+            global last_txt
+            if txt == last_txt:
+                return
 
-        stdscr.clear()
-        for l in txt:
-            try:
-                stdscr.addstr(l)
-            except Exception:
-                break
-        stdscr.refresh()
-        last_txt = txt
+            stdscr.clear()
+            for l in txt:
+                try:
+                    stdscr.addstr(l)
+                except Exception:
+                    break
+            stdscr.refresh()
+            last_txt = txt
 
-    on_event(ipc, None)
+        on_event(ipc, None)
 
-    ipc.on('window', on_event)
-    ipc.on('binding', on_event)
-    ipc.on('workspace', on_event)
+        ipc.on('window', on_event)
+        ipc.on('binding', on_event)
+        ipc.on('workspace', on_event)
 
-    ipc.main()
+        ipc.main()
 
+def main_(stdscr):
+    anyio.run(main, stdscr)
 
-wrapper(main)
+if __name__ == "__main__":
+    wrapper(main_)

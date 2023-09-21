@@ -2,30 +2,27 @@
 
 import asway
 import re
-from argparse import ArgumentParser
+import asyncclick as click
 
-
-def main():
-    parser = ArgumentParser(description='''
+@click.command(help='''
     Simple script to go to a new workspace. It will switch to a workspace with the lowest available number.
-    ''')
-    parser.parse_args()
+        ''')
+async def main():
+    async with asway.Connection() as i3:
 
-    i3 = asway.Connection()
+        workspaces = await i3.get_workspaces()
+        numbered_workspaces = filter(lambda w: w.name[0].isdigit(), workspaces)
+        numbers = list(map(lambda w: int(re.search(r'^([0-9]+)', w.name).group(0)),
+                        numbered_workspaces))
 
-    workspaces = i3.get_workspaces()
-    numbered_workspaces = filter(lambda w: w.name[0].isdigit(), workspaces)
-    numbers = list(map(lambda w: int(re.search(r'^([0-9]+)', w.name).group(0)),
-                       numbered_workspaces))
+        new = 0
 
-    new = 0
+        for i in range(1, max(numbers) + 2):
+            if i not in numbers:
+                new = i
+                break
 
-    for i in range(1, max(numbers) + 2):
-        if i not in numbers:
-            new = i
-            break
-
-    i3.command("workspace %s" % new)
+        await i3.command("workspace %s" % new)
 
 
 if __name__ == '__main__':

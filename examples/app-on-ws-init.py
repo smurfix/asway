@@ -1,34 +1,30 @@
 #!/usr/bin/env python3
 
-from argparse import ArgumentParser
 import asway
+import asyncclick as click
+import math
+import anyio
 
-i3 = asway.Connection()
-
-parser = ArgumentParser(description="""Open the given application each time the
+description="""Open the given application each time the
     given workspace is created. For instance, running 'app-on-ws-init.py 6
-    i3-sensible-terminal' should open your terminal as soon as you create the
-    workspace 6.
-    """)
+    foot' should open a terminal as soon as you create the workspace 6.
+    """
+@click.command(help=description)
+@click.option("--workspace","-w", type=str, multiple=True, help='Workspace to run the command on')
+@click.option("--command","-c", type=str, help='command to run')
+async def main(workspace, command):
+    if not workspace:
+        raise click.UsageError("requires at least one workspace")
+    workspace = set(workspace)
 
-parser.add_argument('--workspace',
-                    metavar='WS_NAME',
-                    nargs='+',
-                    required=True,
-                    help='The name of the workspaces to run the command on')
-parser.add_argument('--command',
-                    metavar='CMD',
-                    required=True,
-                    help='The command to run on the newly initted workspace')
+    async with asway.Connection() as i3:
 
-args = parser.parse_args()
+        async def on_workspace(e):
+            if e.current.name in workspace and not len(e.current.leaves()):
+                await i3.command(f'exec {command}')
 
+        i3.on('workspace::focus', on_workspace)
+        await anyio.sleep(math.inf)
 
-def on_workspace(i3, e):
-    if e.current.name in args.workspace and not len(e.current.leaves()):
-        i3.command('exec {}'.format(args.command))
-
-
-i3.on('workspace::focus', on_workspace)
-
-i3.main()
+if __name__ == "__main__":
+    main()

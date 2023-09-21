@@ -12,13 +12,15 @@
 # https://old.reddit.com/r/i3wm/comments/85ctji/when_windows_are_floating_by_default_how_do_i/
 
 from asway import Connection
+import anyio
 
-i3 = Connection()
+async def main():
+    async with Connection() as wm:
 
+    def set_floating(event):
+        await event.container.command('floating enable')
 
-def set_floating(i3, event):
-    event.container.command('floating enable')
+    wm.on('window::new', set_floating)
+    await wm.main()
 
-
-i3.on('window::new', set_floating)
-i3.main()
+anyio.run(main)

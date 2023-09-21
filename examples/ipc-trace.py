@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
 import asway
+import anyio
 from time import strftime, gmtime
-
-i3 = asway.Connection()
-
 
 def print_separator():
     print('-----')
@@ -15,35 +13,45 @@ def print_time():
 
 
 def print_con_info(con):
-    if con:
-        print('Id: %s' % con.id)
-        print('Name: %s' % con.name)
+    print('Id: %s' % con.id)
+    print('Name: %s' % con.name)
+
+
+def on_evt(e):
+    print_separator()
+    if (chg := getattr(e,"change",None)) is not None:
+        print(f'Got {e.__class__.__name__}::{e.change}')
     else:
-        print('(none)')
-
-
-def on_window(i3, e):
-    print_separator()
-    print('Got window event:')
+        print(f'Got {e.__class__.__name__}')
     print_time()
-    print('Change: %s' % e.change)
-    print_con_info(e.container)
+    for k,v in vars(e).items():
+        if k[0] == "_":
+            continue
+        if k in {"ipc_data","change"}:
+            continue
+        if isinstance(v,asway.Con):
+            print(f'{k.capitalize()}:')
+            print_con_info(v)
+        else:
+            print(f'{k.capitalize()}: {v}')
 
-
-def on_workspace(i3, e):
-    print_separator()
-    print('Got workspace event:')
-    print_time()
-    print('Change: %s' % e.change)
-    print('Current:')
-    print_con_info(e.current)
-    print('Old:')
-    print_con_info(e.old)
 
 
 # TODO subscribe to all events
 
-i3.on('window', on_window)
-i3.on('workspace', on_workspace)
+async def main():
+    async with asway.Connection() as i3:
+        for s in dir(asway.Event):
+            if s[0] == "_":
+                continue
+            v = getattr(asway.Event,s).value
+            if not isinstance(v,str):
+                continue
+            if "::" in v:
+                continue
+            i3.on(v, on_evt)
 
-i3.main()
+        await i3.main()
+
+if __name__ == "__main__":
+    anyio.run(main)

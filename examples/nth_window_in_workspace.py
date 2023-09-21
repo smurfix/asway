@@ -8,14 +8,15 @@
 from itertools import cycle
 from subprocess import check_output
 import asway
+import asyncclick as click
 
 
-def get_windows_on_ws(conn):
-    return filter(lambda x: x.window, conn.get_tree().find_focused().workspace().descendents())
+async def get_windows_on_ws(conn):
+    return filter(lambda x: x.window, (await conn.get_tree()).find_focused().workspace().descendents())
 
 
-def workspace_by_name(conn, workspace):
-    return next(filter(lambda ws: ws.name == workspace, conn.get_tree().workspaces()), None)
+async def workspace_by_name(conn, workspace):
+    return next(filter(lambda ws: ws.name == workspace, (await conn.get_tree()).workspaces()), None)
 
 
 def window_is_visible(w):
@@ -42,13 +43,37 @@ NOTE: maybe add optionals `w_first` and `w_last`"""
         prev = el
 
 
-def main(args):
-    conn = asway.Connection()
+@click.command(name='nth_window_in_workspace.py',
+                            help="""Program to:
+* Select the nth window from a workspace. (i.e. for mapping each window to a key)
+* Go to workspace, or cycle through the windows of the workspace.
+  (improvement on just going to the workspace)""")
 
-    workspace = workspace_by_name(conn, args.workspace)  # Find workspace.
+@click.option('--workspace', help="Name of workspace to go to.")
+@click.option('--select',
+                        default='0',
+                        help="""If integer, that index in workspace.
+if `c`,`cycle` cycle forward if already on same workspace. `r`,`reverse` goes
+backward.
+If none apply goes to the first window in the workspace.""")
+@click.option("--filter",
+                        default='none',
+                        help="filters to apply, i.e. `visible` or `none`(default)")
+@click.option("--mode",
+                        default='default',
+                        help="""Convenience feature;
+what to change the i3-mode to afterwards. So you can exit the mode after you're done.
+Defaultly it goes back to `default`, can set it to `no` to not change mode at all.""")
+
+async def main(**kw):
+    async with asway.Connection() as conn:
+        await main_(conn, **kw)
+async def main_(conn, mode,filter,workspace,select):
+
+    workspace = await workspace_by_name(conn, args.workspace)  # Find workspace.
     if workspace is None:
         print("Workspace %s not found, making it." % args.workspace)
-        conn.command("workspace " + args.workspace)
+        await conn.command("workspace " + args.workspace)
 
     else:
         windows = list(workspace.leaves())  # Find windows in there.
@@ -77,39 +102,15 @@ def main(args):
 
         if window != None:
             print("Focussing %d" % window.window)
-            conn.command('[id="%d"] focus' % window.window)
+            await conn.command('[id="%d"] focus' % window.window)
         else:
             print("Did not find window(%s) going to workspace anyway." % args.select)
-            conn.command("workspace " + args.workspace)
+            await conn.command("workspace " + args.workspace)
 
     if args.mode != 'no':
-        conn.command("mode " + args.mode)
+        await conn.command("mode " + args.mode)
 
 
 if __name__ == '__main__':
+    main()
 
-    from argparse import ArgumentParser
-
-    parser = ArgumentParser(prog='nth_window_in_workspace.py',
-                            description="""Program to:
-* Select the nth window from a workspace. (i.e. for mapping each window to a key)
-* Go to workspace, or cycle through the windows of the workspace.
-  (improvement on just going to the workspace)""")
-
-    parser.add_argument('workspace', help="Name of workspace to go to.")
-    parser.add_argument('select',
-                        default='0',
-                        help="""If integer, that index in workspace.
-if `c`,`cycle` cycle forward if already on same workspace. `r`,`reverse` goes
-backward.
-If none apply goes to the first window in the workspace.""")
-    parser.add_argument("--filter",
-                        default='none',
-                        help="filters to apply, i.e. `visible` or `none`(default)")
-    parser.add_argument("--mode",
-                        default='default',
-                        help="""Convenience feature;
-what to change the i3-mode to afterwards. So you can exit the mode after you're done.
-Defaultly it goes back to `default`, can set it to `no` to not change mode at all.""")
-
-    main(parser.parse_args())

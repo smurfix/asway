@@ -31,16 +31,17 @@ Example
 
 .. code:: python3
 
+
     from asway import Connection, Event
     import anyio
 
     # Create the Connection object that can be used to send commands and subscribe
     # to events.
     async def main():
-      async with asway.Connection() as wm:
+      async with Connection() as wm:
 
         # Print the name of the focused window
-        focused = await wm.get_tree().find_focused()
+        focused = (await wm.get_tree()).find_focused()
         print('Focused window %s is on workspace %s' %
             (focused.name, focused.workspace().name))
 
@@ -49,7 +50,6 @@ Example
         outputs = await wm.get_outputs()
 
         print('Active outputs:')
-
         for output in filter(lambda o: o.active, outputs):
             print(output.name)
 
@@ -57,29 +57,32 @@ Example
         await wm.command('focus left')
 
         # Take all fullscreen windows out of fullscreen
-        for container in (await wm.get_tree().find_fullscreen()):
+        for container in (await wm.get_tree()).find_fullscreen():
             container.command('fullscreen')
 
         # Print the names of all the containers in the tree
+        print('Containers:')
         root = await wm.get_tree()
         print(root.name)
         for con in root:
             print(con.name)
 
         # Define a callback to be called when you switch workspaces.
-        def on_workspace_focus(self, e):
-            # The first parameter is the connection to the ipc and the second is an object
-            # with the data of the event sent from sway.
+        def on_workspace_focus(e):
             if e.current:
                 print('Windows on this workspace:')
                 for w in e.current.leaves():
                     print(w.name)
 
         # Dynamically name your workspaces after the current window class
-        def on_window_focus(e):
-            focused = await wm.get_tree().find_focused()
-            ws_name = "%s:%s" % (focused.workspace().num, focused.window_class)
-            await wm.command('rename workspace to "%s"' % ws_name)
+        async def on_window_focus(e):
+            focused = e.container
+            breakpoint()
+            print("Focus:", focused.window_class)
+            ws = focused.workspace()
+            if ws is not None:
+                ws_name = "%s:%s" % (ws.num, focused.window_class)
+                await wm.command('rename workspace to "%s"' % ws_name)
 
         # Subscribe to events
         wm.on(Event.WORKSPACE_FOCUS, on_workspace_focus)
@@ -87,12 +90,11 @@ Example
 
         # just wait for events to come in.
         import math
-        anyio.sleep(math.inf)
+        await anyio.sleep(math.inf)
 
     # You can use the asyncio backend if you must, but I recommend Trio
     # if you don't depend on libraries that are asyncio-only.
     anyio.run(main, backend="trio")
-
 
 Debug Logging
 -------------

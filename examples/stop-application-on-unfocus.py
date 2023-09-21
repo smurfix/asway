@@ -14,18 +14,11 @@ License: GPLv3
 import atexit
 import asway
 import psutil
+import asyncclick as click
 from argparse import ArgumentParser
 
 
 class FocusMonitor(object):
-    def __init__(self, args):
-        self.had_focus = False
-        self.class_name = args.class_name
-        self.process_name = args.process_name
-        self.debug = args.debug
-        self.conn = asway.Connection()
-        self.conn.on('window::focus', self.focus_change)
-        atexit.register(self.continue_at_exit)
 
     def stop_cont(self, cont=True):
         """Send SIGSTOP/SIGCONT to processes called <name>
@@ -38,7 +31,7 @@ class FocusMonitor(object):
                     sig = 'CONT' if cont else 'STOP'
                     print("Sent SIG%s to process %d" % (sig, proc.pid))
 
-    def focus_change(self, i3conn, event):
+    def focus_change(self, event):
         """Detect focus change on a process with class class_name.
         On change, stop/continue the process called process_name
         """
@@ -52,26 +45,27 @@ class FocusMonitor(object):
         """Send SIGCONT on script termination"""
         self.stop_cont(True)
 
-    def run(self):
-        try:
-            self.conn.main()
-        except KeyboardInterrupt:
-            print('Exiting on keyboard interrupt')
+    def run(self, class_name, process_name, debug):
+        async with asway.Connection() as self.conn:
+            self.had_focus = False
+            self.class_name = class_name
+            self.process_name = process_name
+            self.debug = debug
+            self.conn.on('window::focus', self.focus_change)
+            atexit.register(self.continue_at_exit)
+            try:
+                await self.conn.main()
+            except KeyboardInterrupt:
+                print('Exiting on keyboard interrupt')
 
 
-def parse_args():
-    ap = ArgumentParser()
-    ap.add_argument('class_name')
-    ap.add_argument('process_name')
-    ap.add_argument('-d', '--debug', action='store_true')
-    return ap.parse_args()
-
-
-def main():
-    args = parse_args()
-    fm = FocusMonitor(args)
-    fm.run()
-
+@click.command()
+@click.option('--class_name')
+@click.option('--process_name')
+@click.option('-d', '--debug', is_flag=True)
+async def main(**kw)
+    fm = FocusMonitor()
+    await fm.run(**kw)
 
 if __name__ == '__main__':
     main()

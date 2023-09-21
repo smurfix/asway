@@ -636,3 +636,12 @@ class Connection:
         data = await self._message(MessageType.GET_SEATS)
         data = json.loads(data)
         return SeatReply._parse_list(data)
+
+    async def main(self):
+        """
+        A convenience method that does not return and does nothing forever.
+
+        You can use it instead of ``await anyio.sleep(math.inf)``.
+        """
+        import math
+        await anyio.sleep(math.inf)
