@@ -13,8 +13,8 @@ test:
 	./run-tests.py
 
 docker-test:
-	docker build -t i3ipc-python-test .
-	docker run -it i3ipc-python-test
+	docker build -t asway-test .
+	docker run -it asway-test
 
 clean:
 	rm -rf dist i3ipc.egg-info build docs/_build

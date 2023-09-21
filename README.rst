@@ -17,7 +17,7 @@ If you have an idea for a script to extend asway, you can add your script to the
 
 For details on how to use the library, see the `reference documentation <https://asway.readthedocs.io/en/latest/>`__.
 
-asway is based on `i3ipc-python <https://github.com/altdesktop/i3ipc-python>`__. It was forked because structured async code requires a couple of modifications that didn't work well with the original code base.
+asway is based on `asway <https://github.com/altdesktop/i3ipc-python>`__. It was forked because structured async code requires a couple of modifications (and enables some improvements) that didn't work well with the original code base.
 
 Installation
 ------------

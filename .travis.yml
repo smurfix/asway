@@ -3,6 +3,6 @@ dist: xenial
 services:
   - docker
 before_install:
-  - docker build -t i3ipc-python-test .
+  - docker build -t asway-test .
 script:
-  - docker run -it i3ipc-python-test
+  - docker run -it asway-test
