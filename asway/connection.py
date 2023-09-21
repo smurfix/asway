@@ -1,10 +1,9 @@
-from .._private import pubsub, MessageType, EventType, Synchronizer
-from .._private.aiocon import Con
-from ..replies import (BarConfigReply, CommandReply, ConfigReply, OutputReply, TickReply,
+from ._private import pubsub, MessageType, EventType, Synchronizer
+from .replies import (BarConfigReply, CommandReply, ConfigReply, OutputReply, TickReply,
                        VersionReply, WorkspaceReply, SeatReply, InputReply)
-from ..events import (IpcBaseEvent, BarconfigUpdateEvent, BindingEvent, OutputEvent, ShutdownEvent,
+from .events import (IpcBaseEvent, BarconfigUpdateEvent, BindingEvent, OutputEvent, ShutdownEvent,
                       WindowEvent, TickEvent, ModeEvent, WorkspaceEvent, InputEvent, Event)
-from .. import con
+from .con import Con
 from inspect import iscoroutine
 import os
 import json

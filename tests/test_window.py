@@ -133,9 +133,11 @@ class TestWindow:
                 size2 = 350, 300
 
                 await do_resize(*size1)
+                await anyio.sleep(0.2)
                 con = (await i3.get_tree()).find_by_window(win)
 
                 await do_resize(*size2)
+                await anyio.sleep(0.2)
                 con2 = (await i3.get_tree()).find_by_window(win)
 
                 assert height_width(con) == size1
