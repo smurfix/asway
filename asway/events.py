@@ -201,7 +201,7 @@ class BindingInfo:
         self.mods = data.get('mods', [])
 
     def __repr__(self):
-        return f"Binding‹cmd={self.command !r} key={' '.join(self.event_state_mask+self.symbols)}›"
+        return f"Binding‹cmd={self.command !r} key={' '.join(self.event_state_mask+self.symbols) !r}›"
 
 
 class BindingEvent(IpcBaseEvent):

@@ -133,15 +133,15 @@ async def _find_socket_path(try_i3: bool = False) -> Optional[str]:
             if exists(socket_path):
                 return socket_path
         except Exception as e:
-            logger.info('could not get i3 socket path from %r binary', binary, exc_info=e)
+            logger.info('could not get socket path from %r binary', binary, exc_info=e)
             continue
 
-    logger.info('could not find i3 socket path')
+    logger.info('could not find sway/i3 socket path')
     return None
 
 
 class Connection:
-    """A connection to the i3 ipc used for querying window manager state and
+    """A connection to the sway/i3 ipc used for querying window manager state and
     listening to events.
 
     The ``Connection`` class is the entry point into all features of the
@@ -152,18 +152,18 @@ class Connection:
 
     .. code-block:: python3
 
-        async with Connection().connect() as i3:
-            workspaces = await i3.get_workspaces()
-            await i3.command('focus left')
+        async with Connection().connect() as wm:
+            workspaces = await wm.get_workspaces()
+            await wm.command('focus left')
 
-    :param socket_path: A path to the i3 ipc socket path to connect to. If not
+    :param socket_path: A path to the sway/i3 ipc socket path to connect to. If not
         given, find the socket path through the default search path.
     :type socket_path: str
     :param auto_reconnect: Whether to attempt to reconnect if the connection to
-        the socket is broken when i3 restarts.
+        the socket is broken when sway/i3 restarts.
     :type auto_reconnect: bool
 
-    :raises Exception: If the connection to i3 cannot be established.
+    :raises RuntimeError: If the connection to sway/i3 cannot be established.
     """
     _cmd_socket = None
     _sub_socket = None
@@ -271,7 +271,7 @@ class Connection:
             self._socket_path = await _find_socket_path()
 
         if not self.socket_path:
-            raise RuntimeError('Failed to retrieve the i3 or sway IPC socket path')
+            raise RuntimeError('Failed to retrieve the sway/i3 IPC socket path')
 
         try:
             self._cmd_socket = await anyio.connect_unix(self.socket_path)
@@ -293,7 +293,7 @@ class Connection:
 
     @asynccontextmanager
     async def connect(self) -> 'Connection':
-        """Connects to the i3 ipc socket. This is an async context manager.
+        """Connects to the sway/i3 ipc socket. This is an async context manager.
 
         :returns: The ``Connection``.
         :rtype: :class:`~.Connection`
@@ -343,7 +343,7 @@ class Connection:
 
     async def _message_l(self, message_type: MessageType, payload: str = '') -> bytearray:
         if message_type is MessageType.SUBSCRIBE:
-            raise Exception('cannot subscribe on the command socket')
+            raise ValueError('cannot subscribe on the command socket')
 
         logger.info('sending message: type=%s, payload=%s', message_type, payload)
         err = None
@@ -451,7 +451,7 @@ class Connection:
 
     def _on(self, event: Union[Event, str], handler: Callable[['Connection', IpcBaseEvent], None]):
         """Subscribe to the event and call the handler when it is emitted by
-        the i3 ipc.
+        the sway/i3 ipc.
 
         :param event: The event to subscribe to.
         :type event: :class:`Event <asway.Event>` or str
@@ -484,11 +484,11 @@ class Connection:
         self._pubsub.unsubscribe(handler)
 
     async def command(self, cmd: str) -> List[CommandReply]:
-        """Sends a command to i3.
+        """Sends a command to sway/i3.
 
         .. seealso:: https://i3wm.org/docs/userguide.html#list_of_commands
 
-        :param cmd: The command to send to i3.
+        :param cmd: The command to send to sway/i3.
         :type cmd: str
         :returns: A list of replies that contain info for the result of each
             command given.
@@ -503,9 +503,9 @@ class Connection:
             return []
 
     async def get_version(self) -> VersionReply:
-        """Gets the i3 version.
+        """Gets the sway/i3 version.
 
-        :returns: The i3 version.
+        :returns: The sway/i3 version.
         :rtype: :class:`asway.VersionReply`
         """
         data = await self._message(MessageType.GET_VERSION)
@@ -563,18 +563,18 @@ class Connection:
         return WorkspaceReply._parse_list(data)
 
     async def get_raw_tree(self) -> Con:
-        """Gets the i3 layout tree.
+        """Gets the sway/i3 layout tree.
 
-        :returns: The i3 layout data.
+        :returns: The sway/i3 layout data.
         :rtype: :class:`dict`
         """
         data = await self._message(MessageType.GET_TREE)
         return json.loads(data)
 
     async def get_tree(self) -> Con:
-        """Gets the root container of the i3 layout tree.
+        """Gets the root container of the sway/i3 layout tree.
 
-        :returns: The root container of the i3 layout tree.
+        :returns: The root container of the sway/i3 layout tree.
         :rtype: :class:`asway.Con`
         """
         return Con(await self.get_raw_tree(), None, self)
@@ -598,7 +598,7 @@ class Connection:
         return json.loads(data)
 
     async def get_config(self) -> ConfigReply:
-        """Returns the last loaded i3 config.
+        """Returns the last loaded sway/i3 config.
 
         :returns: A class containing the config.
         :rtype: :class:`asway.ConfigReply`
