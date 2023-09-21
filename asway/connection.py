@@ -97,7 +97,7 @@ def _unpack_header(data: bytes) -> Tuple[bytes, int, int]:
     return struct.unpack(_struct_header, data[:_struct_header_size])
 
 
-async def _find_socket_path() -> Optional[str]:
+async def _find_socket_path(try_i3: bool = False) -> Optional[str]:
     socket_path = None
 
     def exists(path):
@@ -109,21 +109,23 @@ async def _find_socket_path() -> Optional[str]:
         return result
 
     # first try environment variables
-    socket_path = os.environ.get('I3SOCK')
-    if socket_path:
-        logger.info('got socket path from I3SOCK env variable: %s', socket_path)
-        if exists(socket_path):
-            return socket_path
-
     socket_path = os.environ.get('SWAYSOCK')
     if socket_path:
         logger.info('got socket path from SWAYSOCK env variable: %s', socket_path)
         if exists(socket_path):
             return socket_path
 
+    if try_i3:
+        socket_path = os.environ.get('I3SOCK')
+        if socket_path:
+            logger.info('got socket path from I3SOCK env variable: %s', socket_path)
+            if exists(socket_path):
+                return socket_path
+
     # finally try the binaries
-    return None
-    for binary in ('i3', 'sway'):
+    for binary in ('sway', 'i3'):
+        if binary == 'i3' and not try_i3:
+            continue
         try:
             result = await anyio.run_process([binary, '--get-socketpath'])
             socket_path = result.stdout.decode().strip()

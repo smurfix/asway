@@ -2,11 +2,12 @@ from contextlib import asynccontextmanager
 from subprocess import Popen
 import pytest
 import anyio
+from anyio.streams.text import TextReceiveStream
 
 from asway import Connection, CommandReply
 
 import math
-import os,sys
+import os,sys,io
 from random import random
 
 from .window import Window
@@ -21,28 +22,37 @@ class IpcTest:
     async def run(self):
         sock = os.environ["SWAYSOCK"] = os.environ["I3SOCK"] = f"{TMP}/asway-test-{os.getpid()}"
 
-        try:
-            p = 'sway' if SWAY else 'i3'
-            async with await anyio.open_process([p, '-c', f'test/{p}.config']) as process:
+        p = 'sway' if SWAY else 'i3'
+        killed = False
 
-                # wait for i3 to start up
-                #async with Connection().connect() as IpcTest.i3_conn:
-                if True:
-                    try:
-                        #yield IpcTest.i3_conn
-                        self.conn = Connection()
-                        yield self
-                    finally:
-#                       try:
-#                           tree = await IpcTest.i3_conn.get_tree()
-#                           for l in tree.leaves():
-#                               await l.command('kill')
-#                           await IpcTest.i3_conn.command('exit')
-#                       except OSError:
-#                           pass
-#                       finally:
-                            process.kill()
-#                           await process.wait()
+        so = io.StringIO()
+        se = io.StringIO()
+        async def _cp(i,o):
+            try:
+                async for txt in TextReceiveStream(i):
+                    o.write(txt)
+            except anyio.ClosedResourceError:
+                pass
+        async def _run(tg, task_status):
+            async with await anyio.open_process([p, '-c', f'tests/{p}.config']) as process:
+                task_status.started(process)
+                tg.start_soon(_cp,process.stdout,so)
+                tg.start_soon(_cp,process.stderr,se)
+            nonlocal killed
+            if not killed and process.returncode != 0:
+                raise RuntimeError(f"{p} died: {process.returncode}")
+
+        try:
+            async with anyio.create_task_group() as tg:
+                process = await tg.start(_run, tg)
+
+                try:
+                    self.conn = Connection(socket_path=sock)
+                    yield self
+                finally:
+                    if process.returncode is None:
+                        killed = True
+                        process.kill()
         finally:
             self.conn = None
             try:
