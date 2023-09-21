@@ -1,7 +1,7 @@
-i3ipc-python Documentation
-==========================
+asway Documentation
+===================
 
-.. module:: i3ipc
+.. module:: asway
 
 .. toctree::
    :maxdepth: 2

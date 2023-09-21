@@ -23,5 +23,5 @@ set -e
 if test $# -gt 0 ; then
 	pytest -sxvv "$@"
 else
-	pytest -sxv test
+	pytest -sxv tests
 fi

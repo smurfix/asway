@@ -1,8 +1,7 @@
 from .ipctest import i3
 
-from i3ipc import (VersionReply, BarConfigReply, OutputReply, WorkspaceReply, ConfigReply,
-                   TickReply)
-from i3ipc.anyio import Con
+from asynci3 import (VersionReply, BarConfigReply, OutputReply, WorkspaceReply, ConfigReply,
+                   TickReply, Con)
 
 import pytest
 import anyio

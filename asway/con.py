@@ -240,35 +240,6 @@ class Con:
 
         return leaves
 
-    def command(self, command: str) -> List[replies.CommandReply]:
-        """Runs a command on this container.
-
-        .. seealso:: https://i3wm.org/docs/userguide.html#list_of_commands
-
-        :returns: A list of replies for each command in the given command
-            string.
-        :rtype: list(:class:`CommandReply <i3ipc.CommandReply>`)
-        """
-        return self._conn.command('[con_id="{}"] {}'.format(self.id, command))
-
-    def command_children(self, command: str) -> List[replies.CommandReply]:
-        """Runs a command on the immediate children of the currently selected
-        container.
-
-        .. seealso:: https://i3wm.org/docs/userguide.html#list_of_commands
-
-        :returns: A list of replies for each command that was executed.
-        :rtype: list(:class:`CommandReply <i3ipc.CommandReply>`)
-        """
-        if not len(self.nodes):
-            return
-
-        commands = []
-        for c in self.nodes:
-            commands.append('[con_id="{}"] {};'.format(c.id, command))
-
-        self._conn.command(' '.join(commands))
-
     def workspaces(self) -> List['Con']:
         """Gets a list of workspace containers for this tree.
 
@@ -436,3 +407,34 @@ class Con:
                 return con
 
         return None
+
+    async def command(self, command: str) -> List[replies.CommandReply]:
+        """Runs a command on this container.
+
+        .. seealso:: https://i3wm.org/docs/userguide.html#list_of_commands
+
+        :returns: A list of replies for each command in the given command
+            string.
+        :rtype: list(replies.CommandReply)
+        """
+        return await self._conn.command('[con_id="{}"] {}'.format(self.id, command))
+
+    async def command_children(self, command: str) -> List[replies.CommandReply]:
+        """Runs a command on the immediate children of the currently selected
+        container.
+
+        .. seealso:: https://i3wm.org/docs/userguide.html#list_of_commands
+
+        :returns: A list of replies for each command that was executed.
+        :rtype: list(replies.CommandReply)
+        """
+        if not len(self.nodes):
+            return []
+
+        commands = []
+        for c in self.nodes:
+            commands.append('[con_id="{}"] {};'.format(c.id, command))
+
+        return await self._conn.command(' '.join(commands))
+
+
