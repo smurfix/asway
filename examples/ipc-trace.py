@@ -13,8 +13,8 @@ def print_time():
 
 
 def print_con_info(con):
-    print('Id: %s' % con.id)
-    print('Name: %s' % con.name)
+    print('  Id: %s' % con.id)
+    print('  Name: %s' % con.name)
 
 
 def on_evt(e):
@@ -30,14 +30,13 @@ def on_evt(e):
         if k in {"ipc_data","change"}:
             continue
         if isinstance(v,asway.Con):
-            print(f'{k.capitalize()}:')
+            print(f'* {k.capitalize()}: {v.type}')
             print_con_info(v)
         else:
             print(f'{k.capitalize()}: {v}')
 
 
-
-# TODO subscribe to all events
+# subscribe to all events
 
 async def main():
     async with asway.Connection() as i3:
