@@ -90,8 +90,8 @@ if __name__ == "__main__":
 
     async def main():
         async with asway.Connection() as wm:
-            await sw.command("mouse_warping none")
             # otherwise this will be an exercise in frustration
+            await wm.command("mouse_warping none")
 
             sw = SyncWS(wm)
             await sw.run()
