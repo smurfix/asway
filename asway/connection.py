@@ -26,6 +26,10 @@ _running_futures = set()
 logger = logging.getLogger(__name__)
 
 
+def _buffered(s):
+    from anyio.streams.buffered import BufferedByteReceiveStream
+    from anyio.streams.stapled import StapledByteStream
+    return StapledByteStream(s,BufferedByteReceiveStream(s))
 
 from blinker import Signal as _Signal, ANY
 
@@ -215,7 +219,7 @@ class Connection:
         buf = b''
         while True:
             try:
-                buf = await self._sub_socket.receive(_struct_header_size)
+                buf = await self._sub_socket.receive_exactly(_struct_header_size)
             except ConnectionError as e:
                 if self._auto_reconnect:
                     logger.info('could not read message, reconnecting', exc_info=error)
@@ -227,7 +231,7 @@ class Connection:
 
         magic, message_length, event_type = _unpack_header(buf)
         assert magic == _MAGIC
-        raw_message = await self._sub_socket.receive(message_length)
+        raw_message = await self._sub_socket.receive_exactly(message_length)
         message = json.loads(raw_message)
 
         # events have the highest bit set
@@ -274,8 +278,9 @@ class Connection:
             raise RuntimeError('Failed to retrieve the sway/i3 IPC socket path')
 
         try:
-            self._cmd_socket = await anyio.connect_unix(self.socket_path)
-            self._sub_socket = await anyio.connect_unix(self.socket_path)
+            self._cmd_socket = _buffered(await anyio.connect_unix(self.socket_path))
+            self._sub_socket = _buffered(await anyio.connect_unix(self.socket_path))
+
         except ConnectionRefusedError:
             breakpoint()
             raise
@@ -352,7 +357,7 @@ class Connection:
         for tries in range(0, 5):
             try:
                 await self._cmd_socket.send(_pack(message_type, payload))
-                buf = await self._cmd_socket.receive(_struct_header_size)
+                buf = await self._cmd_socket.receive_exactly(_struct_header_size)
                 break
             except Exception as e:
                 if not self._auto_reconnect:
@@ -376,7 +381,7 @@ class Connection:
             message = bytearray()
             remaining_length = message_length
             while remaining_length:
-                buf = await self._cmd_socket.receive(remaining_length)
+                buf = await self._cmd_socket.receive_exactly(remaining_length)
                 if not buf:
                     logger.error('premature ending while reading message (%s bytes remaining)',
                                  remaining_length)
