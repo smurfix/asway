@@ -228,7 +228,7 @@ class Connection:
         magic, message_length, event_type = _unpack_header(buf)
         assert magic == _MAGIC
         raw_message = await self._sub_socket_buf.receive_exactly(message_length)
-        message = json.loads(raw_message)
+        message = json.loads(raw_message.decode("utf-8","surrogateescape"))
 
         # events have the highest bit set
         if not event_type & (1 << 31):
